@@ -1,26 +1,28 @@
-module line_drawing_datapath (
+ module line_drawing_datapath (
 	clk,
 	swap,
 	reset,
-	X, Y
+	X, Y,
+	ld, ld_err,
+	ld_y, ld_delta_x,
+	ld_delta_y, ld_y_step,
+	update_x0_y0,
 	);
 	
-	input clk, swap, reset;
+	/* Input signals from the control */
+	input clk, swap, reset, ld_err, ld_y, ld_delta_x, ld_delta_y, ld_y_step;
+	
+	/* Input from the H/W*/
 	input [8 : 0] X;
 	input [7 : 0] Y;
 
-	// register_nbit #(.SIZE(9)) x0 ();
-	// register_nbit #(.SIZE(9)) x1 ();
-	// register_nbit #(.SIZE(8)) y0 ();
-	// register_nbit #(.SIZE(8)) y1 ();
-	
-	// register_nbit #(.SIZE(9)) delta_x ();
-	// register_nbit #(.SIZE(8)) delta_y ();
-	// register_nbit #(.SIZE(9)) error ();
+	/* Output Combinational signals*/
+	output reg x_lte_x1, y0 < y1
 
-	/* x, y coordinates */
-	reg [8 : 0] x0, x1, delta_x, error;
-	reg [7 : 0] y0, y1, y, delta_y, y_step;
+	/* Registers / local variables */
+	reg [8 : 0] x0, x1, delta_x, error, x;
+	reg [7 : 0] y0, y1, y, delta_y;
+	reg signed [7 : 0] y_step;
 
 	always @(posedge clk or posedge reset) begin
 		if (reset) 
@@ -51,6 +53,12 @@ module line_drawing_datapath (
 			x0 <= x1;
 			y0 <= y1;
 		end
+		/* preserve values if no signal is asserted */
+		else 
+			x0 <= x0;
+			x1 <= x1;
+			y0 <= y0;
+			y1 <= y1;
 	end
 
 	/* delta x*/
@@ -84,6 +92,11 @@ module line_drawing_datapath (
 		else if (ld_err) begin
 			error <= -((delta_x) >> 1); // timing issue?
 		end
+		else if (decr_err) begin
+			error <= error - delta_x;
+		end
+		else 
+			error <= error;
 	end
 
 	always @(posedge clk or posedge reset) begin
@@ -93,17 +106,43 @@ module line_drawing_datapath (
 		else if (ld_y) begin
 			y <= y0;
 		end
+		else if (incr_y) begin
+			y <= y + y_step;
+		end
 		else 
 			y <= y;
 	end
 
-	/* */
-	always @(posedge clk or posedge rst) begin
+	/* y_step */
+	always @(posedge clk or posedge reset) begin
 		if (reset) begin
-			
+			y_step <= 8'b0;
 		end
-		else if () begin
-			
+		else if (ld_y_step) begin
+			y_step <= (y0 >= y1) ? 8'b1111_1111: 8'b00000001;		
+		end
+		else 
+			y_step <= y_step;
+	end
+
+	/* x */
+	always @(posedge clk or posedge reset) begin
+		if (reset) begin
+			x <= 9'b0;
+		end
+		else if (ld_x) begin
+			x <= x0;
+		end
+		else if (incr_x) begin
+			x <= x + 1;
+		end
+		else begin
+			x <= x;
 		end
 	end
+
+	always @ (*) begin
+		
+	end
+
 endmodule
