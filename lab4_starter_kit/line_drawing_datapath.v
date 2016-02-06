@@ -153,7 +153,7 @@
 			y_step <= y_step;
 	end
 
-	/* x */
+	/* register x : the iteration variable */
 	always @(posedge clk or posedge reset) begin
 		if (reset) begin
 			x <= 9'b0;
