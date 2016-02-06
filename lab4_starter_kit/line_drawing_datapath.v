@@ -1,23 +1,27 @@
  module line_drawing_datapath (
 	clk,
-	swap_1,
-	swap_2,
 	reset,
 	X, 
 	Y,
 	ld_initial, 
-	ld_err,
-	ld_y, 
+	ld_steep
+	swap_1,
+	swap_2,
 	ld_delta_x,
 	ld_delta_y, 
+	ld_y, 
 	ld_y_step,
-	update_x0_y0,
+	ld_err_1,
+	ld_x,
 	plot_EN,
 	incr_err,
 	incr_y,
-	incr_x,
 	decr_err,
-
+	incr_x,
+	update_x0_y0,
+	/* outputs */
+	x_lte_x1,
+	Done,
 	);
 	
 	/* Input signals from the control FSM */
