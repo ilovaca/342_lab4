@@ -11,7 +11,7 @@
 	ld_delta_y, 
 	ld_y, 
 	ld_y_step,
-	ld_err_1,
+	ld_err,
 	ld_x,
 	plot_EN,
 	incr_err,
@@ -188,6 +188,6 @@
 	/* Output signals to the FSM */
 	always @ (*) begin
 		x_lte_x1 = (x <= x1);
-
 	end
+	
 endmodule
