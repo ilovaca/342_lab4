@@ -75,7 +75,8 @@ module drawlines(
 
 
 	/* Line algorithm FSM */
-	
+	line_drawing_FSM CONTROL ();
+	line_drawing_datapath DATAPATH ();
 	/* User interface */		
 				
 	/* Circuit outputs. */

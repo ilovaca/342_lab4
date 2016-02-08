@@ -10,4 +10,13 @@ module UI_FSM (input reset, clk, Done, GO , output ld_initial, start);
 			default: ns = 2'bxx;
 		endcase
 	end
+
+	always @(posedge clk or posedge reset) begin
+		if (reset) begin
+			Done <= 
+		end
+		else if () begin
+			
+		end
+	end
 endmodule
