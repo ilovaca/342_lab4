@@ -25,7 +25,8 @@
 	);
 	
 	/* Input signals from the control FSM */
-	input clk, swap_1, swap_2, reset, ld_err, ld_y, ld_delta_x, ld_delta_y, ld_y_step, plot_EN;
+	input clk, reset, ld_initialswap_1, swap_2, reset, ld_err, ld_y, ld_delta_x, 
+			ld_delta_y, ld_y_step, plot_EN, ;
 	
 	/* Input from the Switches */
 	input [8 : 0] X;
@@ -37,7 +38,8 @@
 	/* Outputs to vga_adapter */
 	output reg vga_x, vga_y, plot_EN;
 	/* Registers / local variables */
-	reg [8 : 0] x0, x1, delta_x, error, x;
+	reg [8 : 0] x0, x1, delta_x, x;
+	reg signed [8 : 0] error;
 	reg [7 : 0] y0, y1, y, delta_y;
 	reg signed [7 : 0] y_step;
 	reg steep;
@@ -84,7 +86,7 @@
 			steep <= 0;
 		end
 		else if (ld_steep) begin
-			steep <= (( (y1 - y0) >= 0 ? y1 - y0: y0 - y1) > ((x1 - x0) ? x1 - x0 : x0 - x1));
+			steep <= (( y1 >= y0 ? y1 - y0: y0 - y1) > (x1 >= x0 ? x1 - x0 : x0 - x1));
 		end
 		else 
 			steep <= steep;
@@ -108,7 +110,7 @@
 			delta_y <= 8'b0;
 		end
 		else if (ld_delta_y) begin
-			delta_y <= ((y1 - y0) >= 0) ? (y1 - y0) : (y0 - y1);
+			delta_y <= ((y1 >= y0)) ? (y1 - y0) : (y0 - y1);
 		end
 		else 
 			delta_y <= delta_y;
@@ -119,7 +121,7 @@
 			error <= 9'b0;
 		end
 		else if (ld_err) begin
-			error <= -((delta_x) >> 1); // timing issue?
+			error <= -((delta_x) >> 1); 
 		end
 		else if (incr_err) begin
 			error <= error + delta_y;
@@ -189,5 +191,5 @@
 	always @ (*) begin
 		x_lte_x1 = (x <= x1);
 	end
-	
+
 endmodule
